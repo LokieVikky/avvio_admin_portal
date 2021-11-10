@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:synced_admin_portal/data/data_provider.dart';
-import 'package:synced_admin_portal/data/gl_queries.dart';
 import 'package:synced_admin_portal/entities/department.dart';
 import 'package:synced_admin_portal/enums/loading_enum.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -161,20 +160,11 @@ class _DepartmentScreenState extends State<DepartmentScreen> {
 
   getDepartments() async {
     List<Department> departments = [];
-    List<dynamic> departmentsData;
-    final data = await DataProvider().getQueryResult(getAllDepartments);
-    departmentsData = data.data['communion_department'];
     try {
       setState(() {
         loadingState = LoadingState.loading;
       });
-      departmentsData.forEach((department) {
-        String id = department['id'];
-        String name = department['name'];
-        String years = department['years'];
-        String other_infos = department['other_infos'];
-        departments.add(Department(id, name, years, other_infos));
-      });
+      departments = await DataProvider().getDepartments();
       setState(() {
         departmentDataSource =
             DepartmentDataSource(departmentData: departments);
@@ -186,6 +176,8 @@ class _DepartmentScreenState extends State<DepartmentScreen> {
       });
     }
   }
+
+  addDepartment() {}
 }
 
 class DepartmentDataSource extends DataGridSource {
