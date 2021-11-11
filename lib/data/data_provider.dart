@@ -6,6 +6,10 @@ import 'package:synced_admin_portal/entities/course.dart';
 import 'package:synced_admin_portal/entities/course_areas_of_interest.dart';
 import 'package:synced_admin_portal/entities/course_media.dart';
 import 'package:synced_admin_portal/entities/department.dart';
+import 'package:synced_admin_portal/entities/media.dart';
+import 'package:synced_admin_portal/entities/premium_colleges.dart';
+import 'package:synced_admin_portal/entities/user_areas_of_interest.dart';
+import 'package:synced_admin_portal/entities/users_type.dart';
 
 import 'gl_queries.dart';
 
@@ -482,6 +486,262 @@ class DataProvider {
           MutationOptions(document: gql(deleteCourses), variables: {'_eq': id});
       final QueryResult data =
           await _getMutationResult(deleteCourses, mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  //media
+
+  allMedia() async {
+    List<Media> media = [];
+    List<dynamic> areasOfInterest;
+    final data = await _getQueryResult(getAllMedia);
+    areasOfInterest = data.data['communion_media'];
+    try {
+      areasOfInterest.forEach((course) {
+        String id = course['id'];
+        String type = course['type'];
+        String url = course['url'];
+        course.add(Media(id, type, url));
+      });
+      print(areasOfInterest.toString());
+      return media;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  addMedia(Media media) async {
+    try {
+      MutationOptions options =
+          MutationOptions(document: gql(insertMedia), variables: {
+        'type': media.type,
+        'url': media.url,
+      });
+      final QueryResult data =
+          await _getMutationResult(insertMedia, mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  updateMediaValue(Media media) async {
+    try {
+      MutationOptions options =
+          MutationOptions(document: gql(updateCourses), variables: {
+        'id': media.id,
+        'type': media.type,
+        'url': media.url,
+      });
+      final QueryResult data =
+          await _getMutationResult(updateCourses, mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  deleteMediaValue(String id) async {
+    try {
+      MutationOptions options =
+          MutationOptions(document: gql(deleteMedia), variables: {'_eq': id});
+      final QueryResult data =
+          await _getMutationResult(deleteMedia, mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  //premiumColleges
+
+  allPremiumColleges() async {
+    List<PremiumColleges> premiumColleges = [];
+    List<dynamic> areasOfInterest;
+    final data = await _getQueryResult(getAllPremiumColleges);
+    areasOfInterest = data.data['communion_premium_colleges'];
+    try {
+      areasOfInterest.forEach((premiumColleges) {
+        String id = premiumColleges['id'];
+        String collegeId = premiumColleges['college_id'];
+        premiumColleges.add(PremiumColleges(id, collegeId));
+      });
+      print(areasOfInterest.toString());
+      return premiumColleges;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  addPremiumColleges(PremiumColleges premiumColleges) async {
+    try {
+      MutationOptions options =
+          MutationOptions(document: gql(insertPremiumColleges), variables: {
+        'college_id': premiumColleges.collegeId,
+      });
+      final QueryResult data = await _getMutationResult(insertPremiumColleges,
+          mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  updatePremiumCollegesValue(PremiumColleges premiumColleges) async {
+    try {
+      MutationOptions options =
+          MutationOptions(document: gql(updatePremiumColleges), variables: {
+        'id': premiumColleges.id,
+        'college_id': premiumColleges.collegeId,
+      });
+      final QueryResult data = await _getMutationResult(updatePremiumColleges,
+          mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  deletePremiumCollegesValue(String id) async {
+    try {
+      MutationOptions options = MutationOptions(
+          document: gql(deletePremiumColleges), variables: {'_eq': id});
+      final QueryResult data = await _getMutationResult(deletePremiumColleges,
+          mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  //users_areas_of_interest
+
+  allUsersAreasOfInterest() async {
+    List<UserAreasOfInterest> userAreasOfInterest = [];
+    List<dynamic> areasOfInterest;
+    final data = await _getQueryResult(getAllUsersAreasOfInterest);
+    areasOfInterest = data.data['communion_course_areas_of_interest'];
+    try {
+      areasOfInterest.forEach((userAreasOfInterest) {
+        String id = userAreasOfInterest['id'];
+        String areasOfInterestId = userAreasOfInterest['areas_of_interest_id'];
+        String courseId = userAreasOfInterest['course_id'];
+        userAreasOfInterest
+            .add(UserAreasOfInterest(id, areasOfInterestId, courseId));
+      });
+      print(areasOfInterest.toString());
+      return userAreasOfInterest;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  addUsersAreasOfInterest(UserAreasOfInterest userAreasOfInterest) async {
+    try {
+      MutationOptions options = MutationOptions(
+          document: gql(insertAllUsersAreasOfInterests),
+          variables: {
+            'areas_of_interest_id': userAreasOfInterest.areasOfInterestId,
+            'course_id': userAreasOfInterest.courseId,
+          });
+      final QueryResult data = await _getMutationResult(
+          insertAllUsersAreasOfInterests,
+          mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  updateUsersAreasOfInterestValue(
+      UserAreasOfInterest userAreasOfInterest) async {
+    try {
+      MutationOptions options = MutationOptions(
+          document: gql(updateAllUsersAreasOfInterest),
+          variables: {
+            'id': userAreasOfInterest.id,
+            'areas_of_interest_id': userAreasOfInterest.areasOfInterestId,
+            'course_id': userAreasOfInterest.courseId,
+          });
+      final QueryResult data = await _getMutationResult(
+          updateAllUsersAreasOfInterest,
+          mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  deleteUsersAreasOfInterestValue(String id) async {
+    try {
+      MutationOptions options = MutationOptions(
+          document: gql(deleteAllUsersAreasOfInterest), variables: {'_eq': id});
+      final QueryResult data = await _getMutationResult(
+          deleteAllUsersAreasOfInterest,
+          mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  //users_types
+  getUsersTypes() async {
+    List<UserType> userType = [];
+    List<dynamic> areasOfInterest;
+    final data = await _getQueryResult(getUsersTypes());
+    areasOfInterest = data.data['communion_users_types'];
+    try {
+      areasOfInterest.forEach((userType) {
+        String id = userType['id'];
+        String user = userType['user_type'];
+        userType.add(UserType(id, user));
+      });
+      print(areasOfInterest.toString());
+      return userType;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  addUsersTypes(UserType userType) async {
+    try {
+      MutationOptions options =
+          MutationOptions(document: gql(insertUsersTypes), variables: {
+        'user_type': userType.userType,
+      });
+      final QueryResult data =
+          await _getMutationResult(insertUsersTypes, mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  updateUsersTypesValue(UserType userType) async {
+    try {
+      MutationOptions options =
+          MutationOptions(document: gql(updateUsersTypes), variables: {
+        '_eq': userType.id,
+        'user_type': userType.userType,
+      });
+      final QueryResult data =
+          await _getMutationResult(updateUsersTypes, mutationOptions: options);
+      return data.hasException;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  deleteUsersTypesValue(String id) async {
+    try {
+      MutationOptions options = MutationOptions(
+          document: gql(deleteUsersTypes), variables: {'_eq': id});
+      final QueryResult data =
+          await _getMutationResult(deleteUsersTypes, mutationOptions: options);
       return data.hasException;
     } catch (e) {
       rethrow;
