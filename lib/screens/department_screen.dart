@@ -22,6 +22,7 @@ class _DepartmentScreenState extends State<DepartmentScreen> {
   @override
   void initState() {
     super.initState();
+    departmentDataSource = DepartmentDataSource(departments);
     getDepartments();
   }
 
@@ -165,12 +166,13 @@ class _DepartmentScreenState extends State<DepartmentScreen> {
         loadingState = LoadingState.loading;
       });
       departments = await DataProvider().getDepartments();
+      departmentDataSource.buildDataGridRows(departments);
+      departmentDataSource.updateDataSource();
       setState(() {
-        departmentDataSource =
-            DepartmentDataSource(departmentData: departments);
         loadingState = LoadingState.loadingCompleted;
       });
     } catch (e) {
+      print(e);
       setState(() {
         loadingState = LoadingState.loadingError;
       });
@@ -178,12 +180,18 @@ class _DepartmentScreenState extends State<DepartmentScreen> {
   }
 
   addDepartment() {}
+
+
+
 }
 
 class DepartmentDataSource extends DataGridSource {
   List<DataGridRow> _departmentData = [];
 
-  List<DataGridRow> get departmentData => _departmentData;
+  List<Department> _departmentlist = [];
+
+  @override
+  List<DataGridRow> get rows => _departmentData;
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
@@ -197,16 +205,24 @@ class DepartmentDataSource extends DataGridSource {
     }).toList());
   }
 
-  DepartmentDataSource({required List<Department> departmentData}) {
-    _departmentData = departmentData.asMap().entries.map((e) {
-      int idx = e.key;
-      Department val = e.value;
-      return DataGridRow(cells: [
-        DataGridCell<int>(columnName: 's.no', value: idx),
-        DataGridCell<String>(columnName: 'name', value: val.name),
-        DataGridCell<String>(columnName: 'years', value: val.years),
-        DataGridCell<String>(columnName: 'other_info', value: val.otherInfos),
-      ]);
-    }).toList();
+  void buildDataGridRows(List<Department> _departmentlist) {
+    _departmentData = _departmentlist
+        .map<DataGridRow>((dataGridRow) => DataGridRow(cells: [
+              DataGridCell<String>(columnName: 'id', value: dataGridRow.id),
+              DataGridCell<String>(columnName: 'name', value: dataGridRow.name),
+              DataGridCell<String>(
+                  columnName: 'years', value: dataGridRow.years),
+              DataGridCell<String>(
+                  columnName: 'other info', value: dataGridRow.otherInfos),
+            ]))
+        .toList(growable: false);
+  }
+
+  DepartmentDataSource(this._departmentlist) {
+    buildDataGridRows(_departmentlist);
+  }
+
+  void updateDataSource() {
+    notifyListeners();
   }
 }
